@@ -61,6 +61,10 @@ void CbuttonpracticeDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT1, m_edit1);
 	DDX_Control(pDX, IDC_EDIT2, m_edit2);
+	DDX_Control(pDX, IDC_EDIT3, m_operand1);
+	DDX_Control(pDX, IDC_EDIT4, m_operation);
+	DDX_Control(pDX, IDC_EDIT5, m_operand2);
+	DDX_Control(pDX, IDC_EDIT6, m_answer);
 }
 
 BEGIN_MESSAGE_MAP(CbuttonpracticeDlg, CDialogEx)
@@ -74,6 +78,7 @@ BEGIN_MESSAGE_MAP(CbuttonpracticeDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CbuttonpracticeDlg::OnBnClickedButton4)
 	ON_WM_CREATE()
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BUTTON5, &CbuttonpracticeDlg::OnBnClickedButton5)
 END_MESSAGE_MAP()
 
 
@@ -223,4 +228,49 @@ void CbuttonpracticeDlg::OnDestroy()
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 	MessageBox(L"프로그램이 종료됩니다.", L"프로그램이 종료됩니다.", MB_ICONEXCLAMATION);
+}
+
+
+void CbuttonpracticeDlg::OnBnClickedButton5()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str = _T("");
+	int m_a = 0;
+	int m_b = 0;
+
+	m_operand1.GetWindowText(str); // 계산할 숫자 1
+	m_a = _ttoi(str); // 문자열에서 숫자로 변환 text to integer
+
+	m_operand2.GetWindowText(str); // 계산할 숫자 2
+	m_b = _ttoi(str); // 문자열에서 숫자로 변환
+
+	CString answer; // 결과 출력용 문자열
+
+	m_operation.GetWindowText(str); // 연산자 가져오기
+
+	int nTemp = 0;
+	if (str == "+") // 가져온 연산자가 덧셈이면
+	{
+		nTemp = m_a + m_b;
+	}
+	else if (str == "-") // 가져온 연산자가 뺄셈이면
+	{
+		nTemp = m_a - m_b;
+	}
+	else if (str == "*")
+	{
+		nTemp = m_a * m_b;
+	}
+	else if (str == "/")
+	{
+		nTemp = m_a / m_b;
+	}
+	else if (str == "%")
+	{
+		nTemp = m_a % m_b;
+	}
+
+	answer.Format(_T("%d"), nTemp); // 연산 완료된 숫자를 문자열로 변환
+
+	m_answer.SetWindowTextW(answer); // 결과를 edit control에 출력
 }

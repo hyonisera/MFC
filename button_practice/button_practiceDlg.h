@@ -41,4 +41,9 @@ public:
 	afx_msg void OnBnClickedButton4();
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnDestroy();
+	CEdit m_operand1;
+	CEdit m_operation;
+	CEdit m_operand2;
+	CEdit m_answer;
+	afx_msg void OnBnClickedButton5();
 };
