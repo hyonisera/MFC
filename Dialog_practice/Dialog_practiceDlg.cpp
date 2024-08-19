@@ -217,24 +217,42 @@ void CDialogpracticeDlg::OnNMCustomdrawSlider3(NMHDR* pNMHDR, LRESULT* pResult)
 void CDialogpracticeDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
-	int pos1, pos2, pos3;
-	pos1 = m_slider1.GetPos();
+	// 현재 슬라이더 값 가져오기
+	int pos1 = m_slider1.GetPos();
+	int pos2 = m_slider2.GetPos();
+	int pos3 = m_slider3.GetPos();
+
+	m_cRGB = RGB(pos1, pos2, pos3);
+	
+	// 슬라이더 값을 에디트 컨트롤에 표시
 	SetDlgItemInt(IDC_EDIT1, pos1);
-
-	pos2 = m_slider2.GetPos();
 	SetDlgItemInt(IDC_EDIT2, pos2);
-
-	pos3 = m_slider3.GetPos();
 	SetDlgItemInt(IDC_EDIT3, pos3);
+
+	// 리스트 컨트롤에서 선택된 행의 인덱스 가져오기
+	int clickindex = m_ListCtrl.GetSelectionMark();
+
+	// 선택된 행이 있는 경우 RGB 값 업데이트
+	if (clickindex != -1) {
+		CString r, g, b;
+		r.Format(_T("%d"), pos1);
+		g.Format(_T("%d"), pos2);
+		b.Format(_T("%d"), pos3);
+
+		m_ListCtrl.SetItemText(clickindex, 1, r); // R 값 설정
+		m_ListCtrl.SetItemText(clickindex, 2, g); // G 값 설정
+		m_ListCtrl.SetItemText(clickindex, 3, b); // B 값 설정
+	}
 
 	CRect rect;
 	GetDlgItem(IDC_STATIC_RGB)->GetWindowRect(&rect);
 	ScreenToClient(&rect);
 
-	m_cRGB = RGB(pos1, pos2, pos3);
+	CClientDC dc(this);
+	dc.FillSolidRect(rect, m_cRGB);
 
-	UpdateData(FALSE);
-	InvalidateRect(&rect);
+	/*UpdateData(FALSE);
+	InvalidateRect(&rect);*/
 
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
