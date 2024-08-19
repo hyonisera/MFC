@@ -123,7 +123,7 @@ BOOL CDialogpracticeDlg::OnInitDialog()
 	m_ListCtrl.InsertColumn(1, TEXT("R"), LVCFMT_CENTER, rt.Width() * 0.2);
 	m_ListCtrl.InsertColumn(2, TEXT("G"), LVCFMT_CENTER, rt.Width() * 0.2);
 	m_ListCtrl.InsertColumn(3, TEXT("B"), LVCFMT_CENTER, rt.Width() * 0.2);
-	m_ListCtrl.InsertColumn(4, TEXT("내용"), LVCFMT_CENTER, rt.Width() * 0.2); // 총 길이가 1이기 때문에 /4 해서 0.25씩
+	m_ListCtrl.InsertColumn(4, TEXT("내용"), LVCFMT_CENTER, rt.Width() * 0.2); // 총 길이가 1이기 때문에 /5 해서 0.2씩
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -291,6 +291,7 @@ void CDialogpracticeDlg::OnBnClickedListctrlDel()
 	int idx = m_ListCtrl.GetNextSelectedItem(pos); // 행의 위치를 int형으로 변환
 
 	if (idx != -1) {
+		MessageBox(L"삭제하시겠습니까?", L"삭제하시겠습니까?", MB_ICONEXCLAMATION);
 		m_ListCtrl.DeleteItem(idx); // 행 삭제
 
 		int itemcount = m_ListCtrl.GetItemCount();
