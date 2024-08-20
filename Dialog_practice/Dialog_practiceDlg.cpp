@@ -54,6 +54,7 @@ CDialogpracticeDlg::CDialogpracticeDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG_PRACTICE_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	//  clicked_index = 0;
 }
 
 void CDialogpracticeDlg::DoDataExchange(CDataExchange* pDX)
@@ -75,6 +76,7 @@ BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDC_LISTCTRL_ADD, &CDialogpracticeDlg::OnBnClickedListctrlAdd)
 	ON_BN_CLICKED(IDC_LISTCTRL_DEL, &CDialogpracticeDlg::OnBnClickedListctrlDel)
+	ON_NOTIFY(NM_CLICK, IDC_LISTCTRL, &CDialogpracticeDlg::OnNMClickList)
 END_MESSAGE_MAP()
 
 
@@ -168,13 +170,20 @@ void CDialogpracticeDlg::OnPaint()
 	{
 		CDialogEx::OnPaint();
 
-		// 추가작성
+		// 추가작성 -> 색상을 바꾸는 역할
 		CRect rect;
 		CClientDC rgbdc(GetDlgItem(IDC_STATIC_RGB));
 		CStatic* pSRGB = (CStatic*)GetDlgItem(IDC_STATIC_RGB);
 		pSRGB->GetClientRect(rect);
 		rgbdc.FillSolidRect(rect, m_cRGB);
 		pSRGB->ValidateRect(rect);
+
+		CRect rect2;
+		CClientDC rgbdc2(GetDlgItem(IDC_STATIC_RGB2));
+		CStatic* pSRGB2 = (CStatic*)GetDlgItem(IDC_STATIC_RGB2);
+		pSRGB2->GetClientRect(rect2);
+		rgbdc2.FillSolidRect(rect2, m_cRGB2);
+		pSRGB2->ValidateRect(rect2);
 	}
 }
 
@@ -320,4 +329,33 @@ void CDialogpracticeDlg::OnBnClickedListctrlDel()
 		}
 	}
 	
+}
+
+
+void CDialogpracticeDlg::OnNMClickList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int clickidx = m_ListCtrl.GetSelectionMark();
+	
+	if (clickidx == -1) {
+		*pResult = 0;
+	}
+	CString R = m_ListCtrl.GetItemText(clickidx, 1);
+	CString G = m_ListCtrl.GetItemText(clickidx, 2);
+	CString B = m_ListCtrl.GetItemText(clickidx, 3);
+
+	int Red = _ttoi(R);
+	int Green = _ttoi(G);
+	int Blue = _ttoi(B);
+
+	CRect rect;
+	GetDlgItem(IDC_STATIC_RGB2)->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+
+	m_cRGB2 = RGB(Red, Green, Blue);
+	UpdateData(FALSE);
+	InvalidateRect(&rect);
+
+	*pResult = 0;
 }

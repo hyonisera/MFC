@@ -43,4 +43,7 @@ public:
 	CListCtrl m_ListCtrl;
 	afx_msg void OnBnClickedListctrlAdd();
 	afx_msg void OnBnClickedListctrlDel();
+	afx_msg void OnNMClickList(NMHDR* pNMHDR, LRESULT* pResult);
+//	int clicked_index;
+	COLORREF m_cRGB2;
 };
