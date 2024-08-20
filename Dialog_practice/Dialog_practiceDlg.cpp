@@ -178,12 +178,12 @@ void CDialogpracticeDlg::OnPaint()
 		rgbdc.FillSolidRect(rect, m_cRGB);
 		pSRGB->ValidateRect(rect);
 
-		CRect rect2;
+		/*CRect rect2;
 		CClientDC rgbdc2(GetDlgItem(IDC_STATIC_RGB2));
 		CStatic* pSRGB2 = (CStatic*)GetDlgItem(IDC_STATIC_RGB2);
 		pSRGB2->GetClientRect(rect2);
 		rgbdc2.FillSolidRect(rect2, m_cRGB2);
-		pSRGB2->ValidateRect(rect2);
+		pSRGB2->ValidateRect(rect2);*/
 	}
 }
 
@@ -336,7 +336,7 @@ void CDialogpracticeDlg::OnNMClickList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	int clickidx = m_ListCtrl.GetSelectionMark();
+	/*int clickidx = m_ListCtrl.GetSelectionMark();
 	
 	if (clickidx == -1) {
 		*pResult = 0;
@@ -354,6 +354,26 @@ void CDialogpracticeDlg::OnNMClickList(NMHDR* pNMHDR, LRESULT* pResult)
 	ScreenToClient(&rect);
 
 	m_cRGB2 = RGB(Red, Green, Blue);
+	UpdateData(FALSE);
+	InvalidateRect(&rect);*/
+
+	POSITION pos;
+	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int idx = m_ListCtrl.GetNextSelectedItem(pos);
+
+	CString str;
+	str = m_ListCtrl.GetItemText(idx, 1);
+	CString str1;
+	str1 = m_ListCtrl.GetItemText(idx, 2);
+	CString str2;
+	str2 = m_ListCtrl.GetItemText(idx, 3);
+
+	CRect rect;
+	GetDlgItem(IDC_STATIC_RGB)->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+
+	m_cRGB = RGB(_ttoi(str), _ttoi(str1), _ttoi(str2));
+
 	UpdateData(FALSE);
 	InvalidateRect(&rect);
 
