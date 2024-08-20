@@ -52,6 +52,7 @@ END_MESSAGE_MAP()
 
 CDialogpracticeDlg::CDialogpracticeDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG_PRACTICE_DIALOG, pParent)
+	, m_radio(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	//  clicked_index = 0;
@@ -64,6 +65,11 @@ void CDialogpracticeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER2, m_slider2);
 	DDX_Control(pDX, IDC_SLIDER3, m_slider3);
 	DDX_Control(pDX, IDC_LISTCTRL, m_ListCtrl);
+	DDX_Control(pDX, IDC_PROGRESS1, m_progress);
+	DDX_Control(pDX, IDC_SLIDER4, m_slider4);
+	DDX_Control(pDX, IDC_CHECK1, m_check1);
+	DDX_Control(pDX, IDC_CHECK2, m_check2);
+	DDX_Radio(pDX, IDC_RADIO1, m_radio);
 }
 
 BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
@@ -77,6 +83,11 @@ BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_LISTCTRL_ADD, &CDialogpracticeDlg::OnBnClickedListctrlAdd)
 	ON_BN_CLICKED(IDC_LISTCTRL_DEL, &CDialogpracticeDlg::OnBnClickedListctrlDel)
 	ON_NOTIFY(NM_CLICK, IDC_LISTCTRL, &CDialogpracticeDlg::OnNMClickList)
+	ON_BN_CLICKED(IDC_BUTTON1, &CDialogpracticeDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CDialogpracticeDlg::OnBnClickedButton2)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER4, &CDialogpracticeDlg::OnNMCustomdrawSlider4)
+	ON_BN_CLICKED(IDC_BUTTON3, &CDialogpracticeDlg::OnBnClickedButton3)
+	ON_BN_CLICKED(IDC_BUTTON4, &CDialogpracticeDlg::OnBnClickedButton4)
 END_MESSAGE_MAP()
 
 
@@ -121,11 +132,17 @@ BOOL CDialogpracticeDlg::OnInitDialog()
 	m_ListCtrl.GetWindowRect(&rt);
 	m_ListCtrl.SetExtendedStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT); // 리스트 컨트롤에 선 표시 및 Item 선택시 한 행 전체 선택
 
-	m_ListCtrl.InsertColumn(0, TEXT("순번"), LVCFMT_LEFT, rt.Width() * 0.2);
-	m_ListCtrl.InsertColumn(1, TEXT("R"), LVCFMT_CENTER, rt.Width() * 0.2);
-	m_ListCtrl.InsertColumn(2, TEXT("G"), LVCFMT_CENTER, rt.Width() * 0.2);
-	m_ListCtrl.InsertColumn(3, TEXT("B"), LVCFMT_CENTER, rt.Width() * 0.2);
-	m_ListCtrl.InsertColumn(4, TEXT("내용"), LVCFMT_CENTER, rt.Width() * 0.2); // 총 길이가 1이기 때문에 /5 해서 0.2씩
+	m_ListCtrl.InsertColumn(0, TEXT("순번"), LVCFMT_LEFT, rt.Width() * 0.1);
+	m_ListCtrl.InsertColumn(1, TEXT("R"), LVCFMT_CENTER, rt.Width() * 0.1);
+	m_ListCtrl.InsertColumn(2, TEXT("G"), LVCFMT_CENTER, rt.Width() * 0.1);
+	m_ListCtrl.InsertColumn(3, TEXT("B"), LVCFMT_CENTER, rt.Width() * 0.1);
+	m_ListCtrl.InsertColumn(4, TEXT("CHK1"), LVCFMT_CENTER, rt.Width() * 0.1);
+	m_ListCtrl.InsertColumn(5, TEXT("CHK2"), LVCFMT_CENTER, rt.Width() * 0.1);
+	m_ListCtrl.InsertColumn(6, TEXT("TXT"), LVCFMT_CENTER, rt.Width() * 0.2);
+	m_ListCtrl.InsertColumn(7, TEXT("RADIO"), LVCFMT_CENTER, rt.Width() * 0.2);
+
+	m_progress.SetRange(0, 99); // 최소값 최대값 세팅
+	m_progress.SetPos(10); // 현재 값 세팅
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -263,6 +280,9 @@ void CDialogpracticeDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollB
 	/*UpdateData(FALSE);
 	InvalidateRect(&rect);*/
 
+	int pos4 = m_slider4.GetPos();
+	m_progress.SetPos(pos4);
+
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -302,11 +322,36 @@ void CDialogpracticeDlg::OnBnClickedListctrlAdd()
 	CString str2;
 	GetDlgItemTextW(IDC_LISTCTRL_EDIT, str2);
 
+	bool chk = 0;
+	CString chk1, chk2;
+
+	chk = m_check1.GetCheck();
+	if (chk == 1) {
+		chk1 += L"Y";
+	}
+	else {
+		chk1 += L"N";
+	}
+	chk = m_check2.GetCheck();
+	if (chk == 1) {
+		chk2 += L"Y";
+	}
+	else {
+		chk2 += L"N";
+	}
+
+	UpdateData(true);
+	CString radio;
+	radio.Format(_T("Radio %d"), m_radio + 1);
+
 	m_ListCtrl.InsertItem(num, str); // (n, 0)번째 내용
 	m_ListCtrl.SetItem(num, 1, LVIF_TEXT, r, NULL, NULL, NULL, NULL); // (n, 1)번째 내용
 	m_ListCtrl.SetItem(num, 2, LVIF_TEXT, g, NULL, NULL, NULL, NULL); // (n, 2)번째 내용
 	m_ListCtrl.SetItem(num, 3, LVIF_TEXT, b, NULL, NULL, NULL, NULL); // (n, 3)번째 내용
-	m_ListCtrl.SetItem(num, 4, LVIF_TEXT, str2, NULL, NULL, NULL, NULL); // (n, 4)번째 내용
+	m_ListCtrl.SetItem(num, 4, LVIF_TEXT, chk1, NULL, NULL, NULL, NULL); // (n, 4)번째 내용
+	m_ListCtrl.SetItem(num, 5, LVIF_TEXT, chk2, NULL, NULL, NULL, NULL);
+	m_ListCtrl.SetItem(num, 6, LVIF_TEXT, str2, NULL, NULL, NULL, NULL);
+	m_ListCtrl.SetItem(num, 7, LVIF_TEXT, radio, NULL, NULL, NULL, NULL);
 }
 
 
@@ -378,4 +423,44 @@ void CDialogpracticeDlg::OnNMClickList(NMHDR* pNMHDR, LRESULT* pResult)
 	InvalidateRect(&rect);
 
 	*pResult = 0;
+}
+
+
+void CDialogpracticeDlg::OnBnClickedButton1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_progress.OffsetPos(-10);
+}
+
+
+void CDialogpracticeDlg::OnBnClickedButton2()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_progress.OffsetPos(10);
+}
+
+
+void CDialogpracticeDlg::OnNMCustomdrawSlider4(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	*pResult = 0;
+}
+
+
+void CDialogpracticeDlg::OnBnClickedButton3()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(true);
+	CString str;
+	str.Format(_T("%d 라디오 컨트롤이 선택되었습니다."), m_radio + 1);
+	MessageBox(str);
+}
+
+
+void CDialogpracticeDlg::OnBnClickedButton4()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_radio = 1; // 라디오 1번으로 지정
+	UpdateData(false);
 }

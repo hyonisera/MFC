@@ -46,4 +46,14 @@ public:
 	afx_msg void OnNMClickList(NMHDR* pNMHDR, LRESULT* pResult);
 //	int clicked_index;
 	COLORREF m_cRGB2;
+	CProgressCtrl m_progress;
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton2();
+	afx_msg void OnNMCustomdrawSlider4(NMHDR* pNMHDR, LRESULT* pResult);
+	CSliderCtrl m_slider4;
+	CButton m_check1;
+	CButton m_check2;
+	int m_radio;
+	afx_msg void OnBnClickedButton3();
+	afx_msg void OnBnClickedButton4();
 };
