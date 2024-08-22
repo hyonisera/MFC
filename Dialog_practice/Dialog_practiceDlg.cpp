@@ -72,6 +72,7 @@ void CDialogpracticeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO1, m_radio);
 	DDX_Control(pDX, IDC_COMBO1, m_combo);
 	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Control(pDX, IDC_EDIT4, m_edit4);
 }
 
 BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
@@ -92,6 +93,7 @@ BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON4, &CDialogpracticeDlg::OnBnClickedButton4)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &CDialogpracticeDlg::OnSelchangeCombo1)
 	ON_LBN_SELCHANGE(IDC_LIST1, &CDialogpracticeDlg::OnLbnSelchangeList1)
+	ON_BN_CLICKED(IDC_BUTTON5, &CDialogpracticeDlg::OnBnClickedButton5)
 END_MESSAGE_MAP()
 
 
@@ -498,7 +500,29 @@ void CDialogpracticeDlg::OnLbnSelchangeList1()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	CString str;
 
+	int sel = m_list.GetCurSel();
+
 	str.Format(_T("%d 번 리스트 선택"), m_list.GetCurSel() + 1);
 
 	MessageBox(str);
+
+	m_list.DeleteString(sel);
+}
+
+
+void CDialogpracticeDlg::OnBnClickedButton5()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str;
+	
+	m_edit4.GetWindowTextW(str);
+	//GetDlgItemTextW(IDC_EDIT4, str);
+
+	if (str == "") {
+		MessageBox(_T("내용이 없습니다."));
+	}
+	else {
+		m_combo.AddString(str);
+		m_list.AddString(str);
+	}
 }

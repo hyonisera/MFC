@@ -60,4 +60,6 @@ public:
 	afx_msg void OnSelchangeCombo1();
 	CListBox m_list;
 	afx_msg void OnLbnSelchangeList1();
+	afx_msg void OnBnClickedButton5();
+	CEdit m_edit4;
 };
