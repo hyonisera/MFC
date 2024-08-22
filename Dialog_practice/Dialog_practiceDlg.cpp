@@ -70,6 +70,8 @@ void CDialogpracticeDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK1, m_check1);
 	DDX_Control(pDX, IDC_CHECK2, m_check2);
 	DDX_Radio(pDX, IDC_RADIO1, m_radio);
+	DDX_Control(pDX, IDC_COMBO1, m_combo);
+	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
 BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
@@ -88,6 +90,8 @@ BEGIN_MESSAGE_MAP(CDialogpracticeDlg, CDialogEx)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER4, &CDialogpracticeDlg::OnNMCustomdrawSlider4)
 	ON_BN_CLICKED(IDC_BUTTON3, &CDialogpracticeDlg::OnBnClickedButton3)
 	ON_BN_CLICKED(IDC_BUTTON4, &CDialogpracticeDlg::OnBnClickedButton4)
+	ON_CBN_SELCHANGE(IDC_COMBO1, &CDialogpracticeDlg::OnSelchangeCombo1)
+	ON_LBN_SELCHANGE(IDC_LIST1, &CDialogpracticeDlg::OnLbnSelchangeList1)
 END_MESSAGE_MAP()
 
 
@@ -143,6 +147,18 @@ BOOL CDialogpracticeDlg::OnInitDialog()
 
 	m_progress.SetRange(0, 99); // 최소값 최대값 세팅
 	m_progress.SetPos(10); // 현재 값 세팅
+
+	m_combo.AddString(_T("첫째항목"));
+	m_combo.AddString(_T("둘째항목"));
+	m_combo.AddString(_T("셋째항목"));
+	m_combo.AddString(_T("넷째항목"));
+	m_combo.AddString(_T("다섯째항목"));
+
+	m_list.AddString(_T("첫째항목"));
+	m_list.AddString(_T("둘째항목"));
+	m_list.AddString(_T("셋째항목"));
+	m_list.AddString(_T("넷째항목"));
+	m_list.AddString(_T("다섯째항목"));
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -463,4 +479,26 @@ void CDialogpracticeDlg::OnBnClickedButton4()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	m_radio = 1; // 라디오 1번으로 지정
 	UpdateData(false);
+}
+
+
+void CDialogpracticeDlg::OnSelchangeCombo1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str;
+
+	str.Format(_T("%d 번 콤보 선택"), m_combo.GetCurSel() + 1);
+
+	MessageBox(str);
+}
+
+
+void CDialogpracticeDlg::OnLbnSelchangeList1()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString str;
+
+	str.Format(_T("%d 번 리스트 선택"), m_list.GetCurSel() + 1);
+
+	MessageBox(str);
 }

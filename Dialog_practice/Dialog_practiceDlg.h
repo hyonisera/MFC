@@ -56,4 +56,8 @@ public:
 	int m_radio;
 	afx_msg void OnBnClickedButton3();
 	afx_msg void OnBnClickedButton4();
+	CComboBox m_combo;
+	afx_msg void OnSelchangeCombo1();
+	CListBox m_list;
+	afx_msg void OnLbnSelchangeList1();
 };
