@@ -143,7 +143,14 @@ void COmokDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		/*CDialogEx::OnPaint();*/
+		CPaintDC dc(this); // 깃발을 뽑는 기능까지 있는 CPaintDC를 이용해 COmokDlg의 윈도우 핸들을 받아온다.
+
+		for (int y = 0; y <= 15; y++) { // 바둑판 선 그리기(네모 칸을 여러 개 이어붙여 선을 그리는 듯이 화면을 구성)
+			for (int x = 0; x < 15; x++) {
+				dc.Rectangle(x * 30, y * 30, x * 30 + 31, y * 30 + 31);
+			}
+		}
 	}
 }
 
@@ -167,22 +174,29 @@ void COmokDlg::OnLButtonDown(UINT nFlags, CPoint point)
 
 	CClientDC dc(this); // Client Area에 무언가를 그리겠다는 DC, this는 이 클래스의 주소를 의미
 
-	// 기본적으로 HPEN은 검은색, HBRUSH는 흰색으로 설정되어 있음. 이 자체를 바꾸지는 못하고 직접 다른 HPEN과 HBRUSH를 만들어서 교체해야함
-	CPen my_pen(PS_SOLID, 1, RGB(255, 0, 0)); // 선 종류(실선(점선은 PS_DOT)), 선 굵기, 선 색상
-	CBrush my_brush(RGB(0, 0, 0)); // 배경의 색상만
+	//// 기본적으로 HPEN은 검은색, HBRUSH는 흰색으로 설정되어 있음. 이 자체를 바꾸지는 못하고 직접 다른 HPEN과 HBRUSH를 만들어서 교체해야함
+	//CPen my_pen(PS_SOLID, 1, RGB(255, 0, 0)); // 선 종류(실선(점선은 PS_DOT)), 선 굵기, 선 색상
+	//CBrush my_brush(RGB(0, 0, 0)); // 배경의 색상만
 
-	// my_pen은 지역변수로 나중에 사라짐. 원래의 펜을 잠깐 어디에 둔 후 빨간 펜을 쥐고, 다 쓴 후에는 검정 펜을 다시 쥐어줘야 함.
-	// 그래서 포인터 변수를 하나 선언하여 원래의 펜 주소를 저장해둔다.
-	// 새로 만든 my_pen의 색상을 HPEN에 전해줌과 동시에 원래 가지고 있던 기본 펜의 주소를 *p_old_pen에 전해줌
-	CPen* p_old_pen = dc.SelectObject(&my_pen);
-	CBrush* p_old_brush = dc.SelectObject(&my_brush);
+	//// my_pen은 지역변수로 나중에 사라짐. 원래의 펜을 잠깐 어디에 둔 후 빨간 펜을 쥐고, 다 쓴 후에는 검정 펜을 다시 쥐어줘야 함.
+	//// 그래서 포인터 변수를 하나 선언하여 원래의 펜 주소를 저장해둔다.
+	//// 새로 만든 my_pen의 색상을 HPEN에 전해줌과 동시에 원래 가지고 있던 기본 펜의 주소를 *p_old_pen에 전해줌
+	//CPen* p_old_pen = dc.SelectObject(&my_pen);
+	//CBrush* p_old_brush = dc.SelectObject(&my_brush);
 
-	dc.Rectangle(point.x - 25, point.y - 25, point.x + 25, point.y + 25);
-	// this를 넘겨주는 순간 객체 생성자가 자동으로 생성되고 다 사용한 후에는 자동으로 객체 파괴자까지 생성해주기 때문에 ReleaseDC를 쓸 필요가 없다.
+	//dc.Rectangle(point.x - 25, point.y - 25, point.x + 25, point.y + 25);
+	//// this를 넘겨주는 순간 객체 생성자가 자동으로 생성되고 다 사용한 후에는 자동으로 객체 파괴자까지 생성해주기 때문에 ReleaseDC를 쓸 필요가 없다.
 
-	// 원래의 펜과 붓을 돌려줌. p_old_pen 자체가 주소를 저장하고 있는 값이므로 &연산자를 안 붙임
-	dc.SelectObject(p_old_pen);
-	dc.SelectObject(p_old_brush);
+	//// 원래의 펜과 붓을 돌려줌. p_old_pen 자체가 주소를 저장하고 있는 값이므로 &연산자를 안 붙임
+	//dc.SelectObject(p_old_pen);
+	//dc.SelectObject(p_old_brush);
+
+	int x = (point.x + 15) / 30, y = (point.y + 15) / 30;
+
+	x = x * 30;
+	y = y * 30;
+
+	dc.Ellipse(point.x - 15, point.y - 15, point.x + 15, point.y + 15);
 
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
