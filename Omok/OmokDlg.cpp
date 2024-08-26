@@ -146,9 +146,24 @@ void COmokDlg::OnPaint()
 		/*CDialogEx::OnPaint();*/
 		CPaintDC dc(this); // 깃발을 뽑는 기능까지 있는 CPaintDC를 이용해 COmokDlg의 윈도우 핸들을 받아온다.
 
-		for (int y = 0; y <= 15; y++) { // 바둑판 선 그리기(네모 칸을 여러 개 이어붙여 선을 그리는 듯이 화면을 구성)
-			for (int x = 0; x < 15; x++) {
+		for (int y = 1; y < 16; y++) { // 바둑판 선 그리기(네모 칸을 여러 개 이어붙여 선을 그리는 듯이 화면을 구성)
+			for (int x = 1; x < 16; x++) {
 				dc.Rectangle(x * 30, y * 30, x * 30 + 31, y * 30 + 31);
+			}
+		}
+
+		CBrush black_brush(RGB(0, 0, 0)), * p_old_brush = 0;
+		for (int y = 1; y <= 16; y++) {
+			for (int x = 1; x <= 16; x++) {
+				if (m_dol[y - 1][x - 1] > 0) {
+					if (m_dol[y - 1][x - 1] == 1) {
+						p_old_brush = dc.SelectObject(&black_brush);
+					}
+					dc.Ellipse(x * 30 - 15, y * 30 - 15, x * 30 + 15, y * 30 + 15);
+					if (m_dol[y - 1][x - 1] == 1) {
+						dc.SelectObject(p_old_brush);
+					}
+				}
 			}
 		}
 	}
@@ -191,12 +206,22 @@ void COmokDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	//dc.SelectObject(p_old_pen);
 	//dc.SelectObject(p_old_brush);
 
+	CBrush black_brush(RGB(0, 0, 0)), * p_old_brush = 0;
+
 	int x = (point.x + 15) / 30, y = (point.y + 15) / 30;
 
-	x = x * 30;
-	y = y * 30;
+	if (x > 0 && y > 0 && x <= 16 && y <= 16 && m_dol[y - 1][x - 1] == 0) {
+		m_dol[y - 1][x - 1] = m_is_white + 1;
 
-	dc.Ellipse(point.x - 15, point.y - 15, point.x + 15, point.y + 15);
+		x = x * 30;
+		y = y * 30;
 
+		if (m_is_white == 0) p_old_brush = dc.SelectObject(&black_brush); // m_is_white 변수가 0일 때만 붓을 검정색으로 바꿔준다.
+		dc.Ellipse(x - 15, y - 15, x + 15, y + 15); // 검정 붓으로 오목 돌을 그린다.
+		if (m_is_white == 0) dc.SelectObject(p_old_brush); // m_is_white 변수가 0일 때만 붓을 원래의 것으로 되돌려준다.
+
+		m_is_white = (m_is_white + 1) % 2; // 흰돌과 검은돌이 번갈아가면서 나와야 하므로 m_is_white는 0101을 반복해야 한다.
+	}
+	
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
