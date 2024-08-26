@@ -211,7 +211,7 @@ void COmokDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	int x = (point.x + 15) / 30, y = (point.y + 15) / 30;
 
 	if (x > 0 && y > 0 && x <= 16 && y <= 16 && m_dol[y - 1][x - 1] == 0) {
-		m_dol[y - 1][x - 1] = m_is_white + 1;
+		m_dol[y - 1][x - 1] = m_is_white + 1; // 돌 중복으로 못 두게 하기
 
 		x = x * 30;
 		y = y * 30;
