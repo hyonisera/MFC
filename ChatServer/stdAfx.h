@@ -5,4 +5,4 @@
 
 // 메인 윈도우에 메시지를 보내기 위한 구별자. 즉, 메인 윈도우(여기서는 m_hWnd)에 SendMessage를 이용해 UM_ACCEPT라는 사용자 정의 메시지를 줌.
 #define UM_ACCEPT WM_USER+1
-#define UM_RECEIVE WM_USER+2; // UM_ACCEPT와 비슷한 역할
+#define UM_RECEIVE WM_USER+2 // UM_ACCEPT와 비슷한 역할
