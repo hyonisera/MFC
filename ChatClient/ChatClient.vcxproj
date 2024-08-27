@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,10 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{504B8947-786B-442D-87FA-D8010682DD31}</ProjectGuid>
+    <ProjectGuid>{9ED2D269-49CB-4A15-9D3E-EFA03221480C}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
-    <RootNamespace>ChatServer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <RootNamespace>ChatClient</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -44,6 +44,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
@@ -182,21 +183,18 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ChatServer.h" />
-    <ClInclude Include="ChatServerDlg.h" />
+    <ClInclude Include="ChatClient.h" />
+    <ClInclude Include="ChatClientDlg.h" />
     <ClInclude Include="CSocCom.h" />
-    <ClInclude Include="CSocServer.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="stdAfx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ChatServer.cpp" />
-    <ClCompile Include="ChatServerDlg.cpp" />
+    <ClCompile Include="ChatClient.cpp" />
+    <ClCompile Include="ChatClientDlg.cpp" />
     <ClCompile Include="CSocCom.cpp" />
-    <ClCompile Include="CSocServer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -205,13 +203,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ChatServer.rc" />
+    <ResourceCompile Include="ChatClient.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\ChatServer.rc2" />
+    <None Include="res\ChatClient.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\ChatServer.ico" />
+    <Image Include="res\ChatClient.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

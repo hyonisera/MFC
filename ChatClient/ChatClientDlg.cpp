@@ -1,11 +1,11 @@
 ﻿
-// ChatServerDlg.cpp: 구현 파일
+// ChatClientDlg.cpp: 구현 파일
 //
 
 #include "pch.h"
 #include "framework.h"
-#include "ChatServer.h"
-#include "ChatServerDlg.h"
+#include "ChatClient.h"
+#include "ChatClientDlg.h"
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -46,39 +46,42 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CChatServerDlg 대화 상자
+// CChatClientDlg 대화 상자
 
 
 
-CChatServerDlg::CChatServerDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_CHATSERVER_DIALOG, pParent)
+CChatClientDlg::CChatClientDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_CHATCLIENT_DIALOG, pParent)
+	, m_strIP(_T(""))
 	, m_strSend(_T(""))
-	, m_strStatus(_T(""))
+	, m_strUserID(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CChatServerDlg::DoDataExchange(CDataExchange* pDX)
+void CChatClientDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Text(pDX, IDC_EDIT_IP, m_strIP);
 	DDX_Text(pDX, IDC_EDIT_SEND, m_strSend);
-	DDX_Text(pDX, IDC_STATIC_STATUS, m_strStatus);
+	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Text(pDX, IDC_STATIC_USERID, m_strUserID);
 }
 
-BEGIN_MESSAGE_MAP(CChatServerDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CChatClientDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_MESSAGE(UM_ACCEPT, OnAccept)
 	ON_MESSAGE(UM_RECEIVE, OnReceive)
-	ON_BN_CLICKED(IDC_BUTTON_SEND, &CChatServerDlg::OnClickedButtonSend)
+	ON_BN_CLICKED(IDC_BUTTON_CONNECT, &CChatClientDlg::OnClickedButtonConnect)
+	ON_BN_CLICKED(IDC_BUTTON_SEND, &CChatClientDlg::OnClickedButtonSend)
+	ON_BN_CLICKED(IDCANCEL, &CChatClientDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
-// CChatServerDlg 메시지 처리기
+// CChatClientDlg 메시지 처리기
 
-BOOL CChatServerDlg::OnInitDialog()
+BOOL CChatClientDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -108,28 +111,21 @@ BOOL CChatServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-	/*m_socCom = NULL;*/
-
-	for (int i = 0; i < MAX_CLIENT_COUNT; i++) {
-		m_socServer.m_index.push_back(i);
-	}
-
-	// 서버 소켓을 생성(포트번호 5000)
-	m_socServer.Create(5000);
-	// 클라이언트의 접속을 기다림
-	m_socServer.Listen();
-	// 소켓 클래스와 메인 윈도우(여기에서는 CChatServerDlg)를 연결
-	m_socServer.Init(this->m_hWnd);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
-void CChatServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CChatClientDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
+	}
+	// 위 X키로 종료했을 경우
+	else if (nID == SC_CLOSE) {	// 클라이언트 종료시 서버로 메세지 보냄
+		m_socCom.Send(SOC_CLIENT_DISCONNECT, 256);
+		this->EndDialog(IDCANCEL);
 	}
 	else
 	{
@@ -141,7 +137,7 @@ void CChatServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 애플리케이션의 경우에는
 //  프레임워크에서 이 작업을 자동으로 수행합니다.
 
-void CChatServerDlg::OnPaint()
+void CChatClientDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -168,113 +164,82 @@ void CChatServerDlg::OnPaint()
 
 // 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
 //  이 함수를 호출합니다.
-HCURSOR CChatServerDlg::OnQueryDragIcon()
+HCURSOR CChatClientDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-// 클라이언트 연결 요청이 왔기 때문에 Accept 함수로 접속
-// 실제 접속을 담당하는 것은 CSocServer
-// 이렇게 접속한 소켓은 GetAcceptSocCom을 이용해 얻어옴
-// OnAccept 실행 이후 서버용 소켓인 m_socServer의 역할은 끝나고, 실제 모든 통신은 통신용 소켓인 m_socCom을 이용
-LPARAM CChatServerDlg::OnAccept(UINT wParam, LPARAM lParam) {
-	// 클라이언트에서 접속 요청이 왔을 때
-	try {
-		// 통신용 소켓을 생성한 뒤
-		int tmp = m_socServer.m_index.front();
-
-		CString number;	// 클라이언트 번호
-		number.Format(_T("%d"), tmp);
-
-		m_socCom[tmp] = new CSocCom;
-		// 서버소켓과 통신소켓을 연결한다.
-		m_socCom[tmp] = m_socServer.GetAcceptSocCom();
-
-		m_socServer.m_index.pop_front();
-		m_using.push_back(tmp);
-
-		m_socCom[tmp]->m_index = tmp;
-		m_socCom[tmp]->Init(this->m_hWnd);
-
-		// 클라이언트(사용자)에게 연결 성공 메시지를 보낼 때 클라이언트 번호도 같이 보냄
-		m_socCom[tmp]->Send((_T(SOC_CLIENT_CONNECT) + number), 256);
-	}
-	catch (CException* ex) {
-		ex->ReportError();
-	}
-	//m_strStatus = _T("접속성공");
-
-	//// 통신용 소켓을 생성한 뒤
-	//m_socCom = new CSocCom;
-	//// 서버소켓과 통신소켓을 연결한다.
-	//m_socCom = m_socServer.GetAcceptSocCom();
-	//m_socCom->Init(this->m_hWnd);
-
-	//// 소켓이 연결되었다는 것을 클라이언트에 알리기 위해 Send 함수로 "접속성공"이라는 문자열을 보냄
-	//m_socCom->Send(_T("접속성공"), 256);
-
-	UpdateData(FALSE);
-
-	return TRUE;
-}
-
 // 데이터를 보내는 것은 소켓 클래스의 멤버 함수인 Send를 이용
 // 데이터를 받을 때는 통신 소켓 클래스에 오버라이딩한 OnReceive 메시지 함수를 사용
-LPARAM CChatServerDlg::OnReceive(UINT wParam, LPARAM lParam) {
+LPARAM CChatClientDlg::OnReceive(UINT wParam, LPARAM lParam) {
 	// 접속된 곳에서 데이터가 도착했을 때
+	UpdateData(TRUE);
 	char pTmp[256];
 	CString strTmp;
 	memset(pTmp, '\0', 256);
 
 	// 데이터를 pTmp에 받는다.
-	m_socCom[wParam]->Receive(pTmp, 256);	// wParam = 클라이언트 번호
+	m_socCom.Receive(pTmp, 256);
 	strTmp.Format(_T("%s"), pTmp);
 
-	if (strTmp.Compare(_T(SOC_CLIENT_DISCONNECT)) == 0) {
-		m_socServer.m_socCom[wParam].Close();
-		m_socCom[wParam]->Close();
-		m_socServer.m_index.push_back(wParam);
-		m_using.erase(std::remove(m_using.begin(), m_using.end(), wParam), m_using.end());
+	// 서버로부터 연결 완료 메세지를 받으면
+	if (strTmp.Find(_T(SOC_CLIENT_CONNECT)) == 0) {
+		// Right 함수를 이용해 가장 오른쪽에 있는 번호 추출. 0은 \0이다.
+		m_strUserID = _T("사용자 : ") + strTmp.Right(1);
 	}
 	else {
-		// 리스트박스에 보여준다.
-		CString id;
-		id.Format(_T("%d"), wParam);
-
+		//리스트박스에 보여준다.
 		int i = m_list.GetCount();
-		m_list.InsertString(i, (_T("사용자") + id + " : " + strTmp));
-
-		// 이 부분 제외하면 서버만 다중 클라이언트로부터 채팅 가능
-		for each (int i in m_using) {
-			if (i != _ttoi(id)) {	// 보낸 클라이언트 제외 모든 클라이언트한테 보냄
-				m_socCom[i]->Send((_T("사용자") + id + " : " + strTmp), 256);
-			}
-		}
+		m_list.InsertString(i, strTmp);
 	}
+	UpdateData(FALSE);
 	return TRUE;
 }
 
-void CChatServerDlg::OnClickedButtonSend()
+// 서버에 접속 요청
+// 소켓 클라이언트의 Create함수에서 인자가 있으면 서버로 인식하므로, 인자를 넘기지 않는다. 그러면 클라이언트로 판단해서 동작.
+// Create로 소켓을 생성했다면 실제 접속은 Connect 함수를 이용
+// 첫 번째 인자를 이용해 (m_strIP는 에디터 컨트롤과 연결된 멤버 변수) 접속할 곳의 IP 주소를 넘기며 두 번째 인자를 통해 접속할 포트 번호를 지정
+void CChatClientDlg::OnClickedButtonConnect()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	UpdateData(true);
+	// 접속
+	UpdateData(TRUE);
+	m_socCom.Create();
+	// IP 주소와 포트 번호를 지정
+	m_socCom.Connect(m_strIP, 5000);
+	m_socCom.Init(this->m_hWnd);
+}
+
+// [전송] 버튼을 클릭했을 때
+void CChatClientDlg::OnClickedButtonSend()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
 	wchar_t pTmp[256];
 	CString strTmp;
 
 	// pTmp에 전송할 데이터 입력
 	memset(pTmp, '\0', 256);
-	wcscpy_s(pTmp, _T("관리자 : ") + m_strSend);
+	wcscpy_s(pTmp, 256, m_strSend);
 	m_strSend = "";
 
 	// 전송
-	for each (int i in m_using) {
-		m_socCom[i]->Send(pTmp, 256);
-	}
-	
-	// 전송할 데이터도 리스트박스에 보여준다.
+	m_socCom.Send(pTmp, 256);
+
+	//전송한 데이터도 리스트박스에 보여준다.
 	strTmp.Format(_T("%s"), pTmp);
 	int i = m_list.GetCount();
 	m_list.InsertString(i, strTmp);
 
 	UpdateData(FALSE);
+}
+
+
+void CChatClientDlg::OnBnClickedCancel()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	m_socCom.Send(SOC_CLIENT_DISCONNECT, 256);	// 서버로 종료 메시지 보냄
+	this->EndDialog(IDCANCEL);	// Dialog 닫기
+	CDialogEx::OnCancel();
 }
